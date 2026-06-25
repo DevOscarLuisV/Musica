@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Musica</title>
+  <link rel="stylesheet" href="../assets/dist-tailwind.css">
+  <style>
+    .scrollbar-oculta::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scrollbar-oculta::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .scrollbar-oculta::-webkit-scrollbar-thumb {
+      background-color: rgba(147, 197, 253, 0.3);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body
+  class="relative flex h-dvh w-screen flex-col bg-slate-950/75 bg-cover bg-center bg-fixed before:content-[''] before:absolute before:inset-0 before:bg-[rgba(0,0,0,0.3)] before:z-[1] [&>*]:relative [&>*]:z-[2]">
+
+  <header class="h-10 w-full [-webkit-app-region:drag] flex items-center px-4 justify-end gap-5">
+
+    <button id="btn-cambiar-carpeta"
+      class="[-webkit-app-region:no-drag] text-xs text-sky-300 hover:text-white cursor-pointer opacity-80 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z" />
+      </svg>
+    </button>
+
+    <button
+      class="[-webkit-app-region:no-drag] text-white hover:text-red-500 cursor-pointer uppercase font-bold text-sm tracking-wider transition-colors duration-300"
+      onclick="window.electronAPI.minimizarApp()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14" />
+      </svg>
+    </button>
+
+    <button
+      class="[-webkit-app-region:no-drag] text-white hover:text-red-500 cursor-pointer uppercase font-bold text-sm tracking-wider transition-colors duration-300"
+      onclick="window.electronAPI.cerrarApp()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+        class="size-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+  </header>
+
+  <section class="flex flex-1 flex-row items-center justify-center w-full max-w-4xl mx-auto gap-8 px-4">
+
+    <div
+      class="flex flex-col items-start justify-start w-64 h-80 p-5 rounded-2xl bg-white/5 border border-white/20 shadow-lg backdrop-blur-md text-white overflow-y-auto scrollbar-oculta [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <h2 class="mb-4 text-lg font-bold border-b border-blue-300/30 w-full pb-2 tracking-wide">Mi Playlist</h2>
+      <div id="lista-canciones" class="flex flex-col gap-3 w-full items-start text-left"></div>
+    </div>
+
+    <div
+      class="flex flex-col items-center justify-center w-80 p-6 rounded-lg bg-[rgba(115,124,240,0.2)] backdrop-blur-md text-white controls">
+
+      <h1 class="mb-6 text-2xl font-bold text-center" id="titulo-musica">titulo</h1>
+
+      <audio id="cancion" class="">
+        <source src="" type="audio/mpeg" />
+      </audio>
+
+      <input id="barra-musica" type="range" value="0" min="0" max="100" class="w-full h-1.5 bg-blue-300/30 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none 
+         [&::-webkit-slider-thumb]:w-4
+         [&::-webkit-slider-thumb]:h-4 
+         [&::-webkit-slider-thumb]:bg-blue-300 
+         [&::-webkit-slider-thumb]:rounded-full
+         [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(147,197,253,0.7)]
+         transition-all duration-150" />
+
+        <div class="flex w-full text-xs text-sky-300 mt-1.5 font-mono opacity-80" style="width: 100%;">
+          <span id="tiempo-actual">0:00</span>
+          <span id="tiempo-total" style="margin-left: auto; ">0:00</span>
+        </div>
+
+      <div class="mt-6 flex items-center justify-center gap-6">
+
+       <button id="btn-bucle" class="text-blue-300/50 hover:text-blue-300 transition-all cursor-pointer" title="Repetir Lista">
+        </button>
+
+        </button>
+
+        <button class="text-sky-300 hover:text-white cursor-pointer transition-transform duration-300 hover:scale-110"
+          id="btn-atras">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z" />
+          </svg>
+        </button>
+
+        <button
+          class="border-2 border-sky-300 rounded-full p-3 text-sky-300 hover:bg-sky-300 hover:text-blue-900 cursor-pointer transition-all duration-300 transform hover:scale-105"
+          id="btn-reproducir-pausar">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+          </svg>
+        </button>
+
+        <button class="text-sky-300 hover:text-white cursor-pointer transition-transform duration-300 hover:scale-110"
+          id="btn-siguiente">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
+          </svg>
+        </button>
+
+        <button id="btn-aleatorio" class="text-blue-300/50 hover:text-blue-300 transition-all cursor-pointer" title="Aleatorio">
+        </button>
+
+      </div>
+    </div>
+    <div class="flex flex-col items-center justify-center pl-6 border-l border-blue-300/20 py-2">
+      <input id="control-volumen" type="range" min="0" max="100" value="15"
+        style="writing-mode: vertical-lr; direction: rtl;" class="h-24 w-1.5 bg-blue-300/30 rounded-lg appearance-none cursor-pointer 
+                 [&::-webkit-slider-thumb]:appearance-none 
+                 [&::-webkit-slider-thumb]:w-4
+                 [&::-webkit-slider-thumb]:h-4 
+                 [&::-webkit-slider-thumb]:bg-blue-300 
+                 [&::-webkit-slider-thumb]:rounded-full
+                 [&::-webkit-slider-thumb]:shadow-[0_0_10px_rgba(147,197,253,0.7)]
+                 transition-all duration-150" />
+    </div>
+    </div>
+  </section>
+  <script src="./app.js"></script>
+</body>
+
+</html>
